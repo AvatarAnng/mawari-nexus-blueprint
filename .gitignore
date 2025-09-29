@@ -1,0 +1,6 @@
+# Folder data sementara, jangan di-upload
+mawari_data/
+.nexus/
+
+# File instalasi sementara
+install.sh
