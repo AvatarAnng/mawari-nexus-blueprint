@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- KONFIGURASI ---
-REPO_NAME="mawari-nexus-blueprint" # Nama repo lu udah diisi
+REPO_NAME="mawari-nexus-blueprint"
 MAWARI_SESSION="mawari"
 NEXUS_SESSION="nexus"
 WORKDIR="/workspaces/$REPO_NAME"
@@ -11,10 +11,9 @@ echo "=============================================="
 echo "    MEMULAI SKRIP SETUP NODE OTOMATIS"
 echo "=============================================="
 
-# Fungsi sakti buat ngecek secret, kalo ga ada langsung modar
 check_secret() {
   if [ -z "$1" ]; then
-    echo "❌ ERROR: Secret '$2' tidak ditemukan. Pastikan sudah di-set di Pengaturan Repositori."
+    echo "❌ ERROR: Secret '$2' tidak ditemukan." >> /tmp/startup_log.txt
     exit 1
   fi
 }
@@ -28,7 +27,7 @@ if ! command -v nexus-cli &> /dev/null; then
         NONINTERACTIVE=1 ./install.sh
         echo "✅ Instalasi Nexus selesai."
     else
-        echo "❌ ERROR: Gagal download skrip instalasi Nexus."
+        echo "❌ ERROR: Gagal download skrip instalasi Nexus." >> /tmp/startup_log.txt
         exit 1
     fi
 else
@@ -39,13 +38,11 @@ echo "[NEXUS] Menulis ulang konfigurasi dari secret..."
 check_secret "$NEXUS_WALLET_ADDRESS" "NEXUS_WALLET_ADDRESS"
 check_secret "$NEXUS_NODE_ID" "NEXUS_NODE_ID"
 
-# HAPUS DAN BIKIN ULANG folder config biar bersih
 rm -rf ~/.nexus
 mkdir -p ~/.nexus
 echo "{\"node_id\":\"$NEXUS_NODE_ID\"}" > ~/.nexus/config.json
 echo "✅ Konfigurasi Node ID Nexus berhasil ditulis ulang."
 
-# Register user (aman dijalankan berulang, cuma buat mastiin)
 nexus-cli register-user --wallet-address "$NEXUS_WALLET_ADDRESS"
 
 tmux has-session -t $NEXUS_SESSION 2>/dev/null
@@ -68,7 +65,6 @@ if [ $? != 0 ]; then
   export OWNER_ADDRESS="$MAWARI_OWNER_ADDRESS"
   export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
   
-  # HAPUS DAN BIKIN ULANG folder data Mawari biar bersih
   rm -rf $WORKDIR/mawari_data
   mkdir -p $WORKDIR/mawari_data
 
@@ -79,7 +75,11 @@ else
   echo "✅ Sesi tmux '$MAWARI_SESSION' sudah berjalan."
 fi
 
-echo -e "\n=============================================="
-echo "      SETUP SELESAI. SEMUA NODE AKTIF."
-echo "=============================================="
-echo "Gunakan 'tmux attach -t mawari' atau 'tmux attach -t nexus' untuk melihat log."
+echo -e "\n==============================================" >> /tmp/startup_log.txt
+echo "      SETUP SELESAI. SEMUA NODE AKTIF." >> /tmp/startup_log.txt
+echo "==============================================" >> /tmp/startup_log.txt
+
+# =======================================================
+# == PERINTAH SAKTI BUAT NGASIH TANDA KALO SEMUA BERES ==
+# =======================================================
+touch /tmp/startup_success
