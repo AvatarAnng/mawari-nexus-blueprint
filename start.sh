@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# =======================================================
+# == CCTV AKTIF: Merekam semua output ke file log      ==
+# =======================================================
+exec > >(tee -a "/workspaces/mawari-nexus-blueprint/startup-debug.log") 2>&1
+
 # --- KONFIGURASI ---
 REPO_NAME="mawari-nexus-blueprint"
 MAWARI_SESSION="mawari"
@@ -8,17 +13,17 @@ WORKDIR="/workspaces/$REPO_NAME"
 # --------------------
 
 echo "=============================================="
-echo "    MEMULAI SKRIP SETUP NODE OTOMATIS"
+echo "    MEMULAI SKRIP SETUP NODE OTOMATIS (v.CCTV)"
 echo "=============================================="
 
+# ... (sisa skripnya sama persis kayak sebelumnya, gak perlu diubah) ...
 check_secret() {
   if [ -z "$1" ]; then
-    echo "❌ ERROR: Secret '$2' tidak ditemukan." >> /tmp/startup_log.txt
+    echo "❌ ERROR: Secret '$2' tidak ditemukan."
     exit 1
   fi
 }
 
-# --- SETUP NEXUS ---
 echo -e "\n[NEXUS] Memeriksa instalasi..."
 if ! command -v nexus-cli &> /dev/null; then
     echo "  -> nexus-cli tidak ditemukan. Menginstal..."
@@ -27,7 +32,7 @@ if ! command -v nexus-cli &> /dev/null; then
         NONINTERACTIVE=1 ./install.sh
         echo "✅ Instalasi Nexus selesai."
     else
-        echo "❌ ERROR: Gagal download skrip instalasi Nexus." >> /tmp/startup_log.txt
+        echo "❌ ERROR: Gagal download skrip instalasi Nexus."
         exit 1
     fi
 else
@@ -54,8 +59,6 @@ else
   echo "✅ Sesi tmux '$NEXUS_SESSION' sudah berjalan."
 fi
 
-
-# --- SETUP MAWARI ---
 echo -e "\n[MAWARI] Menyiapkan konfigurasi..."
 check_secret "$MAWARI_OWNER_ADDRESS" "MAWARI_OWNER_ADDRESS"
 
@@ -75,11 +78,9 @@ else
   echo "✅ Sesi tmux '$MAWARI_SESSION' sudah berjalan."
 fi
 
-echo -e "\n==============================================" >> /tmp/startup_log.txt
-echo "      SETUP SELESAI. SEMUA NODE AKTIF." >> /tmp/startup_log.txt
-echo "==============================================" >> /tmp/startup_log.txt
+echo -e "\n=============================================="
+echo "      SETUP SELESAI. SEMUA NODE AKTIF."
+echo "=============================================="
 
-# =======================================================
-# == PERINTAH SAKTI BUAT NGASIH TANDA KALO SEMUA BERES ==
-# =======================================================
+# Perintah sakti buat ngasih tanda kalo semua beneran beres
 touch /tmp/startup_success
