@@ -2,7 +2,10 @@
   "name": "Mawari & Nexus Node Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/sshd:1": {
+        "version": "latest"
+    }
   },
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y tmux curl",
   "postAttachCommand": "bash /workspaces/mawari-nexus-blueprint/start.sh"
