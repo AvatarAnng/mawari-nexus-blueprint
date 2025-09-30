@@ -16,7 +16,6 @@ echo "=============================================="
 echo "    MEMULAI SKRIP SETUP NODE OTOMATIS (v.CCTV)"
 echo "=============================================="
 
-# ... (sisa skripnya sama persis kayak sebelumnya, gak perlu diubah) ...
 check_secret() {
   if [ -z "$1" ]; then
     echo "❌ ERROR: Secret '$2' tidak ditemukan."
