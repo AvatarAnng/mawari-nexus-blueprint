@@ -4,3 +4,18 @@ mawari_data/
 
 # File instalasi sementara
 install.sh
+
+# State file - jangan di-upload untuk keamanan
+state.json
+
+# Log files
+startup-debug.log
+*.log
+
+# Rust build artifacts
+target/
+Cargo.lock
+
+# OS files
+.DS_Store
+Thumbs.db
