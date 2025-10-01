@@ -1,21 +1,65 @@
-# Folder data sementara, jangan di-upload
+# ==========================================
+# RUNTIME DATA - JANGAN DI-UPLOAD
+# ==========================================
+
+# Node data directories
 mawari_data/
 .nexus/
 
-# File instalasi sementara
+# Temporary installation files
 install.sh
 
-# State file - jangan di-upload untuk keamanan
+# State files - CRITICAL: Jangan di-upload!
 state.json
 
 # Log files
+startup.log
 startup-debug.log
 *.log
 
-# Rust build artifacts
+# ==========================================
+# RUST BUILD ARTIFACTS
+# ==========================================
 target/
 Cargo.lock
+**/*.rs.bk
 
-# OS files
-.DS_Store
+# ==========================================
+# ORCHESTRATOR - HANYA DI LAPTOP
+# ==========================================
+# Semua file orchestrator di-ignore
+# Kontrol hanya dari laptop, tidak perlu di repo
+
+# Jangan commit token!
+tokens.json
+
+# ==========================================
+# OS SPECIFIC
+# ==========================================
+# Windows
 Thumbs.db
+Desktop.ini
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# ==========================================
+# IDE / EDITOR
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ==========================================
+# DOCKER
+# ==========================================
+.dockerignore
