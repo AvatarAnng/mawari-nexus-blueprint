@@ -1,6 +1,10 @@
 #!/bin/bash
 # auto-start.sh - Run setiap kali codespace start/restart
 
+# TAMBAHKAN JEDA 5 DETIK UNTUK MENUNGGU INISIALISASI
+echo "Menunggu 5 detik agar semua layanan siap..."
+sleep 5
+
 WORKDIR="/workspaces/mawari-nexus-blueprint"
 LOG_FILE="$WORKDIR/autostart.log"
 
