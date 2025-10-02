@@ -52,14 +52,23 @@ elif [ "$NODE_TYPE" == "nexus" ]; then
     curl -sSf https://cli.nexus.xyz/ -o install.sh
     chmod +x install.sh
     NONINTERACTIVE=1 ./install.sh
+    rm -f install.sh
     
     # Reload PATH
-    export PATH="$HOME/.cargo/bin:$PATH"
+    source /home/vscode/.profile
+    
+    # Install tmux (TAMBAHAN INI)
+    echo "Installing tmux..."
+    sudo apt-get update && sudo apt-get install -y tmux
     
     echo "✅ Nexus CLI installed"
+    echo "✅ tmux installed"
 fi
 
 echo ""
 echo "════════════════════════════════════════════════"
 echo "✅ First setup complete"
 echo "📝 Log: $LOG_FILE"
+
+# Mark as done
+touch /tmp/first_setup_done
