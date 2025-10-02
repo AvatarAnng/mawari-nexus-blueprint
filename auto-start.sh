@@ -61,6 +61,15 @@ if [ "$NODE_TYPE" == "mawari" ]; then
         
         export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
         
+        # Verify cache file exists
+        if [ ! -f ~/mawari/mawari_data/flohive-cache.json ]; then
+            echo "❌ ERROR: flohive-cache.json not found!"
+            exit 1
+        fi
+        
+        echo "✅ Cache file verified"
+        cat ~/mawari/mawari_data/flohive-cache.json
+        
         # Run in detached mode
         docker run -d \
             --name mawari-node \
