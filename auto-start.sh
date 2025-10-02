@@ -56,6 +56,17 @@ if [ "$NODE_TYPE" == "mawari" ]; then
         
         cd ~/mawari
         
+        # Verify cache file
+        echo "📄 Checking cache file..."
+        if [ ! -f ~/mawari/mawari_data/flohive-cache.json ]; then
+            echo "❌ ERROR: Cache file missing! Run first-setup.sh"
+            exit 1
+        fi
+        
+        echo "✅ Cache file found:"
+        cat ~/mawari/mawari_data/flohive-cache.json
+        echo ""
+        
         # Stop old container if exists
         docker rm -f mawari-node 2>/dev/null || true
         
