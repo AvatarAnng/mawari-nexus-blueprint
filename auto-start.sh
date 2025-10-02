@@ -27,36 +27,59 @@ fi
 echo "✅ Node Type: $NODE_TYPE"
 echo ""
 
-# Check if screen session exists
-if screen -list | grep -q "$NODE_TYPE"; then
-    echo "ℹ️  Screen session '$NODE_TYPE' already running"
-else
-    echo "🚀 Starting $NODE_TYPE in screen..."
-    
-    if [ "$NODE_TYPE" == "mawari" ]; then
+# MAWARI - USE SCREEN
+if [ "$NODE_TYPE" == "mawari" ]; then
+    if screen -list | grep -q "mawari"; then
+        echo "ℹ️  Screen session 'mawari' already running"
+    else
+        echo "🚀 Starting Mawari in screen..."
+        
         cd ~/mawari
         export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
         export OWNER_ADDRESS="$MAWARI_OWNER_ADDRESS"
         
         screen -dmS mawari bash -c "docker run --pull always -v ~/mawari:/app/cache -e OWNERS_ALLOWLIST=\$OWNER_ADDRESS \$MNTESTNET_IMAGE"
         echo "✅ Mawari started in screen"
+    fi
+fi
+
+# NEXUS - USE TMUX
+if [ "$NODE_TYPE" == "nexus" ]; then
+    # Update Nexus CLI
+    echo "🔄 Updating Nexus CLI..."
+    cd /tmp
+    curl -sSf https://cli.nexus.xyz/ -o install.sh
+    chmod +x install.sh
+    NONINTERACTIVE=1 ./install.sh
+    rm -f install.sh
+    
+    # Load PATH
+    source /home/vscode/.profile
+    
+    if tmux has-session -t nexus 2>/dev/null; then
+        echo "ℹ️  Tmux session 'nexus' already running"
+    else
+        echo "🚀 Starting Nexus in tmux..."
         
-    elif [ "$NODE_TYPE" == "nexus" ]; then
-        # Update CLI (untuk dapat update terbaru)
-        cd /tmp
-        curl -sSf https://cli.nexus.xyz/ -o install.sh
-        chmod +x install.sh
-        NONINTERACTIVE=1 ./install.sh
+        # Register user first
+        nexus-cli register-user --wallet-address "$NEXUS_WALLET_ADDRESS" || true
         
-        export PATH="$HOME/.cargo/bin:$PATH"
-        
-        # Register & start
-        screen -dmS nexus bash -c "nexus-cli register-user --wallet-address $NEXUS_WALLET_ADDRESS && nexus-cli start --node-id $NEXUS_NODE_ID --headless"
-        echo "✅ Nexus started in screen"
+        # Start in tmux
+        tmux new-session -d -s nexus "nexus-cli start --node-id $NEXUS_NODE_ID --headless"
+        echo "✅ Nexus started in tmux"
     fi
 fi
 
 echo ""
-echo "📊 To view: screen -r $NODE_TYPE"
-echo "📊 To list: screen -ls"
+echo "📊 View logs:"
+if [ "$NODE_TYPE" == "mawari" ]; then
+    echo "   screen -r mawari"
+    echo "   (Detach: Ctrl+A then D)"
+else
+    echo "   tmux attach -t nexus"
+    echo "   (Detach: Ctrl+B then D)"
+fi
 echo "📝 Log: $LOG_FILE"
+
+# Mark as done
+touch /tmp/auto_start_done
