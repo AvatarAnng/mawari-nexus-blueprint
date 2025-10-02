@@ -7,6 +7,7 @@
       "version": "latest"
     }
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y tmux screen curl wget jq && chmod +x /workspaces/mawari-nexus-blueprint/*.sh && bash /workspaces/mawari-nexus-blueprint/first-setup.sh",
-  "postStartCommand": "bash /workspaces/mawari-nexus-blueprint/auto-start.sh"
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y screen curl wget jq && chmod +x /workspaces/mawari-nexus-blueprint/*.sh && bash /workspaces/mawari-nexus-blueprint/first-setup.sh",
+  "postAttachCommand": "bash /workspaces/mawari-nexus-blueprint/auto-start.sh",
+  "remoteUser": "vscode"
 }
