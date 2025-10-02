@@ -1,13 +1,13 @@
 #!/bin/bash
-# auto-start.sh - Run setiap kali codespace start/restart
+# first-setup.sh - Run saat codespace pertama kali dibuat
 
 WORKDIR="/workspaces/mawari-nexus-blueprint"
-LOG_FILE="$WORKDIR/autostart.log"
+LOG_FILE="$WORKDIR/setup.log"
 
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "╔════════════════════════════════════════════════╗"
-echo "║     AUTO START                                ║"
+echo "║     FIRST TIME SETUP                          ║"
 echo "╚════════════════════════════════════════════════╝"
 echo "📅 $(date '+%Y-%m-%d %H:%M:%S')"
 
@@ -27,105 +27,93 @@ fi
 echo "✅ Node Type: $NODE_TYPE"
 echo ""
 
-# MAWARI - USE DOCKER
 if [ "$NODE_TYPE" == "mawari" ]; then
-    # Check if already running
-    if docker ps | grep -q mawari-node; then
-        echo "ℹ️  Mawari container already running"
-    else
-        echo "🚀 Starting Mawari container..."
-        
-        # Validate secrets
-        if [ -z "$MAWARI_BURNER_PRIVATE_KEY" ]; then
-            echo "❌ ERROR: MAWARI_BURNER_PRIVATE_KEY tidak tersedia!"
-            exit 1
-        fi
-        
-        if [ -z "$MAWARI_BURNER_ADDRESS" ]; then
-            echo "❌ ERROR: MAWARI_BURNER_ADDRESS tidak tersedia!"
-            exit 1
-        fi
-        
-        if [ -z "$MAWARI_OWNER_ADDRESS" ]; then
-            echo "❌ ERROR: MAWARI_OWNER_ADDRESS tidak tersedia!"
-            exit 1
-        fi
-        
-        echo "✅ Using burner: $MAWARI_BURNER_ADDRESS"
-        echo "✅ Using owner: $MAWARI_OWNER_ADDRESS"
-        
-        cd ~/mawari
-        
-        # Stop old container if exists
-        docker rm -f mawari-node 2>/dev/null || true
-        
-        export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
-        
-        # Run in detached mode
-        docker run -d \
-            --name mawari-node \
-            --pull always \
-            -v ~/mawari/mawari_data:/app/cache \
-            -e OWNERS_ALLOWLIST="$MAWARI_OWNER_ADDRESS" \
-            $MNTESTNET_IMAGE
-        
-        echo "✅ Mawari container started"
-        sleep 3
-        docker ps | grep mawari-node
+    echo "🌐 Setting up Mawari..."
+    
+    # Validate secrets
+    if [ -z "$MAWARI_BURNER_PRIVATE_KEY" ]; then
+        echo "❌ ERROR: MAWARI_BURNER_PRIVATE_KEY tidak ditemukan!"
+        exit 1
     fi
-fi
-
-# NEXUS - USE TMUX
-if [ "$NODE_TYPE" == "nexus" ]; then
+    
+    if [ -z "$MAWARI_BURNER_ADDRESS" ]; then
+        echo "❌ ERROR: MAWARI_BURNER_ADDRESS tidak ditemukan!"
+        exit 1
+    fi
+    
+    if [ -z "$MAWARI_OWNER_ADDRESS" ]; then
+        echo "❌ ERROR: MAWARI_OWNER_ADDRESS tidak ditemukan!"
+        exit 1
+    fi
+    
+    echo "✅ Burner wallet: $MAWARI_BURNER_ADDRESS"
+    echo "✅ Owner address: $MAWARI_OWNER_ADDRESS"
+    
+    # Create directory
+    mkdir -p ~/mawari/mawari_data
+    
+    # Create flohive-cache.json (EXACT path Docker expects)
+    cat > ~/mawari/mawari_data/flohive-cache.json <<'EOF'
+{
+  "burnerWallet": {
+    "privateKey": "PRIVATE_KEY_PLACEHOLDER",
+    "address": "ADDRESS_PLACEHOLDER"
+  }
+}
+EOF
+    
+    # Replace placeholders
+    sed -i "s|PRIVATE_KEY_PLACEHOLDER|$MAWARI_BURNER_PRIVATE_KEY|g" ~/mawari/mawari_data/flohive-cache.json
+    sed -i "s|ADDRESS_PLACEHOLDER|$MAWARI_BURNER_ADDRESS|g" ~/mawari/mawari_data/flohive-cache.json
+    
+    echo "✅ Mawari directory created"
+    echo "✅ flohive-cache.json created"
+    
+    # Verify file
+    echo "📄 Cache file content:"
+    cat ~/mawari/mawari_data/flohive-cache.json
+    
+    # Set permissions
+    chmod 644 ~/mawari/mawari_data/flohive-cache.json
+    
+elif [ "$NODE_TYPE" == "nexus" ]; then
+    echo "🔷 Setting up Nexus..."
+    
     # Validate secrets
     if [ -z "$NEXUS_WALLET_ADDRESS" ]; then
-        echo "❌ ERROR: NEXUS_WALLET_ADDRESS tidak tersedia!"
+        echo "❌ ERROR: NEXUS_WALLET_ADDRESS tidak ditemukan!"
         exit 1
     fi
     
     if [ -z "$NEXUS_NODE_ID" ]; then
-        echo "❌ ERROR: NEXUS_NODE_ID tidak tersedia!"
+        echo "❌ ERROR: NEXUS_NODE_ID tidak ditemukan!"
         exit 1
     fi
     
-    echo "✅ Using wallet: $NEXUS_WALLET_ADDRESS"
-    echo "✅ Using node ID: $NEXUS_NODE_ID"
+    echo "✅ Wallet: $NEXUS_WALLET_ADDRESS"
+    echo "✅ Node ID: $NEXUS_NODE_ID"
     
-    # Update Nexus CLI
-    echo "🔄 Updating Nexus CLI..."
+    # Install Nexus CLI
     cd /tmp
     curl -sSf https://cli.nexus.xyz/ -o install.sh
     chmod +x install.sh
     NONINTERACTIVE=1 ./install.sh
     rm -f install.sh
     
-    # Load PATH
+    # Reload PATH
     source /home/vscode/.profile
     
-    if tmux has-session -t nexus 2>/dev/null; then
-        echo "ℹ️  Tmux session 'nexus' already running"
-    else
-        echo "🚀 Starting Nexus in tmux..."
-        
-        # Register user
-        echo "Registering with wallet: $NEXUS_WALLET_ADDRESS"
-        nexus-cli register-user --wallet-address "$NEXUS_WALLET_ADDRESS" || true
-        
-        # Start in tmux
-        tmux new-session -d -s nexus "nexus-cli start --node-id $NEXUS_NODE_ID --headless"
-        echo "✅ Nexus started in tmux"
-    fi
+    # Install tmux
+    echo "Installing tmux..."
+    sudo apt-get update && sudo apt-get install -y tmux
+    
+    echo "✅ Nexus CLI installed"
+    echo "✅ tmux installed"
 fi
 
 echo ""
-echo "📊 View logs:"
-if [ "$NODE_TYPE" == "mawari" ]; then
-    echo "   docker logs -f mawari-node"
-    echo "   docker ps"
-else
-    echo "   tmux attach -t nexus"
-    echo "   (Detach: Ctrl+B then D)"
-fi
+echo "════════════════════════════════════════════════"
+echo "✅ First setup complete"
 echo "📝 Log: $LOG_FILE"
 
-touch /tmp/auto_start_done
+touch /tmp/first_setup_done
