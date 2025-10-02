@@ -27,24 +27,70 @@ fi
 echo "✅ Node Type: $NODE_TYPE"
 echo ""
 
-# MAWARI - USE SCREEN
+# MAWARI - USE DOCKER
 if [ "$NODE_TYPE" == "mawari" ]; then
-    if screen -list | grep -q "mawari"; then
-        echo "ℹ️  Screen session 'mawari' already running"
+    # Check if already running
+    if docker ps | grep -q mawari-node; then
+        echo "ℹ️  Mawari container already running"
     else
-        echo "🚀 Starting Mawari in screen..."
+        echo "🚀 Starting Mawari container..."
+        
+        # Validate secrets
+        if [ -z "$MAWARI_BURNER_PRIVATE_KEY" ]; then
+            echo "❌ ERROR: MAWARI_BURNER_PRIVATE_KEY tidak tersedia!"
+            exit 1
+        fi
+        
+        if [ -z "$MAWARI_BURNER_ADDRESS" ]; then
+            echo "❌ ERROR: MAWARI_BURNER_ADDRESS tidak tersedia!"
+            exit 1
+        fi
+        
+        if [ -z "$MAWARI_OWNER_ADDRESS" ]; then
+            echo "❌ ERROR: MAWARI_OWNER_ADDRESS tidak tersedia!"
+            exit 1
+        fi
+        
+        echo "✅ Using burner: $MAWARI_BURNER_ADDRESS"
+        echo "✅ Using owner: $MAWARI_OWNER_ADDRESS"
         
         cd ~/mawari
-        export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
-        export OWNER_ADDRESS="$MAWARI_OWNER_ADDRESS"
         
-        screen -dmS mawari bash -c "docker run --pull always -v ~/mawari:/app/cache -e OWNERS_ALLOWLIST=\$OWNER_ADDRESS \$MNTESTNET_IMAGE"
-        echo "✅ Mawari started in screen"
+        # Stop old container if exists
+        docker rm -f mawari-node 2>/dev/null || true
+        
+        export MNTESTNET_IMAGE=us-east4-docker.pkg.dev/mawarinetwork-dev/mwr-net-d-car-uses4-public-docker-registry-e62e/mawari-node:latest
+        
+        # Run in detached mode
+        docker run -d \
+            --name mawari-node \
+            --pull always \
+            -v ~/mawari/mawari_data:/app/cache \
+            -e OWNERS_ALLOWLIST="$MAWARI_OWNER_ADDRESS" \
+            $MNTESTNET_IMAGE
+        
+        echo "✅ Mawari container started"
+        sleep 3
+        docker ps | grep mawari-node
     fi
 fi
 
 # NEXUS - USE TMUX
 if [ "$NODE_TYPE" == "nexus" ]; then
+    # Validate secrets
+    if [ -z "$NEXUS_WALLET_ADDRESS" ]; then
+        echo "❌ ERROR: NEXUS_WALLET_ADDRESS tidak tersedia!"
+        exit 1
+    fi
+    
+    if [ -z "$NEXUS_NODE_ID" ]; then
+        echo "❌ ERROR: NEXUS_NODE_ID tidak tersedia!"
+        exit 1
+    fi
+    
+    echo "✅ Using wallet: $NEXUS_WALLET_ADDRESS"
+    echo "✅ Using node ID: $NEXUS_NODE_ID"
+    
     # Update Nexus CLI
     echo "🔄 Updating Nexus CLI..."
     cd /tmp
@@ -61,7 +107,8 @@ if [ "$NODE_TYPE" == "nexus" ]; then
     else
         echo "🚀 Starting Nexus in tmux..."
         
-        # Register user first
+        # Register user
+        echo "Registering with wallet: $NEXUS_WALLET_ADDRESS"
         nexus-cli register-user --wallet-address "$NEXUS_WALLET_ADDRESS" || true
         
         # Start in tmux
@@ -73,13 +120,12 @@ fi
 echo ""
 echo "📊 View logs:"
 if [ "$NODE_TYPE" == "mawari" ]; then
-    echo "   screen -r mawari"
-    echo "   (Detach: Ctrl+A then D)"
+    echo "   docker logs -f mawari-node"
+    echo "   docker ps"
 else
     echo "   tmux attach -t nexus"
     echo "   (Detach: Ctrl+B then D)"
 fi
 echo "📝 Log: $LOG_FILE"
 
-# Mark as done
 touch /tmp/auto_start_done
